@@ -40,7 +40,7 @@ namespace DB338Core
 
             if (accepted == "True")
             {
-                string[,] results = transactionMgr.Process(tokens, queryType);
+                Dictionary<String, List<String>> results = transactionMgr.Process(tokens, queryType);
                 QueryResult queryResult = new QueryResult(queryType, done, accepted, error);
                 queryResult.Results = results;
                 return queryResult;

@@ -17,9 +17,9 @@ namespace DB338Core
             tables = new List<IntSchTable>();
         }
 
-        public string[,] Process(List<string> tokens, string type)
+        public Dictionary<String,List<String>> Process(List<string> tokens, string type)
         {
-            string[,] results = new string[1,1];
+            Dictionary<String, List<String>> results = null;
             bool success;
 
             if (type == "create")
@@ -36,19 +36,19 @@ namespace DB338Core
             }
             else if (type == "alter")
             {
-                results = ProcessAlterStatement(tokens);
+               // results = ProcessAlterStatement(tokens);
             }
             else if (type == "delete")
             {
-                results = ProcessDeleteStatement(tokens);
+                // results = ProcessDeleteStatement(tokens);
             }
             else if (type == "drop")
             {
-                results = ProcessDropStatement(tokens);
+                // results = ProcessDropStatement(tokens);
             }
             else if (type == "update")
             {
-                results = ProcessUpdateStatement(tokens);
+                // results = ProcessUpdateStatement(tokens);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace DB338Core
             return results;
         }
 
-        private string[,] ProcessSelectStatement(List<string> tokens)
+        private Dictionary<String, List<String>> ProcessSelectStatement(List<string> tokens)
         {
             // <Select Stm> ::= SELECT <Columns> <From Clause> <Where Clause> <Group Clause> <Having Clause> <Order Clause>
 

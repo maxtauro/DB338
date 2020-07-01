@@ -13,7 +13,7 @@ namespace DB338Core
         private string accepted;
         private string error;
 
-        private string[,] results;
+        private Dictionary<String, List<String>> results;
 
         public QueryResult(string qt, string d, string acc, string err)
         {
@@ -24,7 +24,7 @@ namespace DB338Core
             results = null;
         }
 
-        public string[,] Results { get => results; set => results = value; }
+        public Dictionary<String, List<String>> Results { get => results; set => results = value; }
         public string QueryType { get => queryType; set => queryType = value; }
         public string Done { get => done; set => done = value; }
         public string Accepted { get => accepted; set => accepted = value; }

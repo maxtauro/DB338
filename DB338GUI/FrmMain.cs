@@ -26,7 +26,7 @@ namespace DB338GUI
             for (int i = 0; i < TxtQuery.Lines.Length; ++i)
             {
                 QueryResult queryResult = db.SubmitQuery(TxtQuery.Lines[i]);
-                string[,] queryResults = queryResult.Results;
+                Dictionary<String, List<String>> queryResults = queryResult.Results;
                 if (queryResult.Error != "none")
                 {
                     //null means error
@@ -38,18 +38,44 @@ namespace DB338GUI
             }
         }
 
-        public void Output(string[,] results)
+        public void Output(Dictionary<String, List<String>> results)
         {
-            string s = "";
-            for (int i = 0; i <= results.GetUpperBound(0); ++i)
+            if (results == null) return;
+
+            List<String> columns = new List<String>(results.Keys);
+            int numRows = results[columns[0]].Count;
+
+            dataGridView1.ColumnCount = columns.Count;
+
+            for (int i = 0; i < columns.Count; i++)
             {
-                for (int j = 0; j <= results.GetUpperBound(1); ++j)
-                {
-                    s += results[i, j] + ", ";
-                }
-                s += Environment.NewLine;
+                dataGridView1.Columns[i].Name = columns[i];
             }
-            TxtResults.Text = s;
+
+            for (int i = 0; i < numRows; i++)
+            {
+                string[] emptyRow = new string[columns.Count];
+                dataGridView1.Rows.Add(emptyRow);
+            }
+
+            foreach (string col in columns)
+            {
+                List<String> columnEntries = results[col];
+                for (int row = 0; row < numRows; row++)
+                {
+                    dataGridView1.Rows[row].Cells[col].Value = columnEntries[row];
+                }
+            }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

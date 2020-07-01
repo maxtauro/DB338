@@ -20,25 +20,33 @@ namespace DB338Core
         public string Name { get => name; set => name = value; }
 
 
-        public string[,] Select(List<string> cols)
+        public Dictionary<String, List<String>> Select(List<string> columnsToSelect)
         {
-            string[,] results = new string[columns[0].items.Count, cols.Count];
+            string[,] results = new string[columns[0].items.Count + 1, columnsToSelect.Count];
+            Dictionary<String, List<String>> result = new Dictionary<string, List<string>>();
 
-            for (int i = 0; i < cols.Count; ++i)
+            for (int i = 0; i < columnsToSelect.Count; ++i)
             {
-                for (int j = 0; j < columns.Count; ++j)
+                results[0, i] = columnsToSelect[i];
+            }
+
+            foreach (string columnToSelect in columnsToSelect)
+            {
+                result[columnToSelect] = new List<String>();
+
+                for (int i = 0; i < columns.Count; ++i)
                 {
-                    if (cols[i] == columns[j].Name)
+                    if (columnToSelect == columns[i].Name)
                     {
-                        for (int z = 0; z < columns[0].items.Count; ++z)
+                        for (int z = 0; z < columns[i].items.Count; ++z)
                         {
-                            results[z, i] = columns[j].items[z];
+                            result[columnToSelect].Add(columns[i].items[z]);
                         }
                     }
                 }
             }
 
-            return results;
+            return result;
         }
 
         public bool Project()

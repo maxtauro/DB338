@@ -31,7 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.TxtQuery = new System.Windows.Forms.TextBox();
             this.BtnSubmitQuery = new System.Windows.Forms.Button();
-            this.TxtResults = new System.Windows.Forms.TextBox();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // TxtQuery
@@ -54,25 +55,28 @@
             this.BtnSubmitQuery.UseVisualStyleBackColor = true;
             this.BtnSubmitQuery.Click += new System.EventHandler(this.BtnSubmitQuery_Click);
             // 
-            // TxtResults
+            // dataGridView1
             // 
-            this.TxtResults.Font = new System.Drawing.Font("Courier New", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtResults.Location = new System.Drawing.Point(12, 169);
-            this.TxtResults.Multiline = true;
-            this.TxtResults.Name = "TxtResults";
-            this.TxtResults.Size = new System.Drawing.Size(672, 219);
-            this.TxtResults.TabIndex = 3;
+            this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(12, 169);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(672, 213);
+            this.dataGridView1.TabIndex = 4;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(798, 400);
-            this.Controls.Add(this.TxtResults);
+            this.ClientSize = new System.Drawing.Size(798, 397);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.BtnSubmitQuery);
             this.Controls.Add(this.TxtQuery);
             this.Name = "FrmMain";
             this.Text = "DB338 0.01 Alpha";
+            this.Load += new System.EventHandler(this.FrmMain_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -81,7 +85,7 @@
         #endregion
         private System.Windows.Forms.TextBox TxtQuery;
         private System.Windows.Forms.Button BtnSubmitQuery;
-        private System.Windows.Forms.TextBox TxtResults;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 
