@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DB338Core
 {
-    class IntSchColumn
+    public class IntSchColumn
     {
         public List<string> items;
 

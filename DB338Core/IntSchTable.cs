@@ -4,49 +4,78 @@ using System.Text;
 
 namespace DB338Core
 {
-    class IntSchTable
+    public class IntSchTable
     {
 
         private string name;
 
-        private List<IntSchColumn> columns;
+        private readonly bool allowDuplicateCols;
 
-        public IntSchTable(string initname)
+        public List<string> columnNames = new List<string>();
+        private List<IntSchColumn> columns;
+        public int numRows = 0;
+
+        public IntSchTable(string initname, bool allowDuplicateCols = false)
         {
-            name = initname;
-            columns = new List<IntSchColumn>();
+            this.name = initname;
+            this.columns = new List<IntSchColumn>();
+            this.allowDuplicateCols = allowDuplicateCols;
         }
 
         public string Name { get => name; set => name = value; }
 
 
-        public Dictionary<String, List<String>> Select(List<string> columnsToSelect)
+        public IntSchTable Select(List<string> columnsToSelect)
         {
-            string[,] results = new string[columns[0].items.Count + 1, columnsToSelect.Count];
+            IntSchTable resultTable = new IntSchTable(this.name, /*allowDuplicateCols=*/ true);
             Dictionary<String, List<String>> result = new Dictionary<string, List<string>>();
-
-            for (int i = 0; i < columnsToSelect.Count; ++i)
-            {
-                results[0, i] = columnsToSelect[i];
-            }
 
             foreach (string columnToSelect in columnsToSelect)
             {
-                result[columnToSelect] = new List<String>();
+                if (columnToSelect == "*")
+                {
+                    foreach (IntSchColumn column in this.columns)
+                    {
+                        resultTable.AddColumn(column.Name, "Any");
+                        result[column.Name] = new List<String>();
+                    }
+                }
+                else
+                {
+                    resultTable.AddColumn(columnToSelect, "Any");
+                    result[columnToSelect] = new List<String>();
+                }
+            }
+
+            foreach (IntSchColumn columnToSelect in resultTable.columns)
+            {
+                string columnName = columnToSelect.Name;
 
                 for (int i = 0; i < columns.Count; ++i)
                 {
-                    if (columnToSelect == columns[i].Name)
+                    if (columnName == columns[i].Name)
                     {
                         for (int z = 0; z < columns[i].items.Count; ++z)
                         {
-                            result[columnToSelect].Add(columns[i].items[z]);
+                            result[columnName].Add(columns[i].items[z]);
                         }
                     }
                 }
             }
 
-            return result;
+            for (int row = 0; row < this.numRows; ++row)
+            {
+                List<string> rowVals = new List<string>();
+
+                foreach (string column in resultTable.columnNames)
+                {
+                    rowVals.Add(result[column][row]);
+                }
+                 
+                resultTable.Insert(resultTable.columnNames, rowVals);
+            }
+
+            return resultTable;
         }
 
         public bool Project()
@@ -66,20 +95,53 @@ namespace DB338Core
                     }
                 }
             }
+
+            numRows++;
         }
 
         public bool AddColumn(string name, string type)
+        {
+            if (!allowDuplicateCols)
+            {
+                foreach (IntSchColumn col in columns)
+                {
+                    if (col.Name == name)
+                    {
+                        return false;
+                    }
+                }
+            }
+            
+            columnNames.Add(name);
+            columns.Add(new IntSchColumn(name, type));
+
+            return true;
+        }
+
+        public IntSchColumn GetColumn(string name)
         {
             foreach (IntSchColumn col in columns)
             {
                 if (col.Name == name)
                 {
-                    return false;
+                    return col;
                 }
             }
 
-            columns.Add(new IntSchColumn(name, type));
-            return true;
+            return null;
+        }
+
+        public bool ContainsColumn(string name)
+        {
+            foreach (IntSchColumn col in columns)
+            {
+                if (col.Name == name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

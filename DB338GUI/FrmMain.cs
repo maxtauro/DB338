@@ -26,7 +26,7 @@ namespace DB338GUI
             for (int i = 0; i < TxtQuery.Lines.Length; ++i)
             {
                 QueryResult queryResult = db.SubmitQuery(TxtQuery.Lines[i]);
-                Dictionary<String, List<String>> queryResults = queryResult.Results;
+                IntSchTable queryResults = queryResult.Results;
                 if (queryResult.Error != "none")
                 {
                     //null means error
@@ -38,13 +38,15 @@ namespace DB338GUI
             }
         }
 
-        public void Output(Dictionary<String, List<String>> results)
+        public void Output(IntSchTable results)
         {
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            dataGridView1.Refresh();
+
             if (results == null) return;
 
-            List<String> columns = new List<String>(results.Keys);
-            int numRows = results[columns[0]].Count;
-
+            List<string> columns = results.columnNames;
             dataGridView1.ColumnCount = columns.Count;
 
             for (int i = 0; i < columns.Count; i++)
@@ -52,30 +54,22 @@ namespace DB338GUI
                 dataGridView1.Columns[i].Name = columns[i];
             }
 
-            for (int i = 0; i < numRows; i++)
+            for (int i = 0; i < results.numRows; i++)
             {
                 string[] emptyRow = new string[columns.Count];
                 dataGridView1.Rows.Add(emptyRow);
             }
 
-            foreach (string col in columns)
+            for (int col = 0; col < columns.Count; ++col)
             {
-                List<String> columnEntries = results[col];
-                for (int row = 0; row < numRows; row++)
+                string columnName = columns[col];
+                IntSchColumn columnEntries = results.GetColumn(columnName);
+                for (int row = 0; row < results.numRows; row++)
                 {
-                    dataGridView1.Rows[row].Cells[col].Value = columnEntries[row];
+                    dataGridView1.Rows[row].Cells[col].Value = columnEntries.Get(row);
                 }
             }
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void FrmMain_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }

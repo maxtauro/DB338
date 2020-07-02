@@ -17,7 +17,7 @@ namespace DB338Core
             tables = new List<IntSchTable>();
         }
 
-        public Dictionary<String,List<String>> Process(List<string> tokens, string type)
+        public void Process(List<string> tokens, string type, ref QueryResult queryResult)
         {
             Dictionary<String, List<String>> results = null;
             bool success;
@@ -32,7 +32,7 @@ namespace DB338Core
             }
             else if (type == "select")
             {
-                results = ProcessSelectStatement(tokens);
+               ProcessSelectStatement(tokens, ref queryResult);
             }
             else if (type == "alter")
             {
@@ -55,13 +55,15 @@ namespace DB338Core
                 results = null;
             }
             //other parts of SQL to do...
-
-            return results;
         }
 
-        private Dictionary<String, List<String>> ProcessSelectStatement(List<string> tokens)
+        private void ProcessSelectStatement(List<string> tokens, ref QueryResult queryResult)
         {
-            // <Select Stm> ::= SELECT <Columns> <From Clause> <Where Clause> <Group Clause> <Having Clause> <Order Clause>
+            // <Select Stm> ::= SELECT <Columns> <From Clause> <Where Clause> <Group Clause> <Having Clause> <Order Clause>\
+
+            IntSchTable tableToSelectFrom = null;
+
+            IntSchTable results = null;
 
             List<string> colsToSelect = new List<string>();
             int tableOffset = 0;
@@ -83,17 +85,49 @@ namespace DB338Core
                 }
             }
 
-            string tableToSelectFrom = tokens[tableOffset];
+            string nameOfTableToSelectFrom = tokens[tableOffset];
 
+
+            // Validate Table's existence
             for (int i = 0; i < tables.Count; ++i)
             {
-                if (tables[i].Name == tableToSelectFrom)
+                if (tables[i].Name == nameOfTableToSelectFrom)
                 {
-                    return tables[i].Select(colsToSelect);
+                    tableToSelectFrom = tables[i];
+                    break;
                 }
             }
 
-            return null;
+            if (tableToSelectFrom == null)
+            {
+                queryResult.Error = "Could not find table: " + nameOfTableToSelectFrom;
+                return;
+            }
+
+
+            // Validate Columns
+            List<string> missingColumns = new List<string>();           
+
+            foreach (string column in colsToSelect)
+            {
+            if (column != "*" && !tableToSelectFrom.ContainsColumn(column))
+                {
+                    missingColumns.Add(column);
+                }
+
+            }
+
+            if (missingColumns.Count != 0)
+            {
+                queryResult.Error = "Could not find columns: " + missingColumns;
+                return;
+            }
+
+
+            // Execute Selection
+            results = tableToSelectFrom.Select(colsToSelect);
+            queryResult.Results = results;
+            return;
         }
 
         private bool ProcessInsertStatement(List<string> tokens)

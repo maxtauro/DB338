@@ -57,16 +57,18 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(12, 169);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(672, 213);
             this.dataGridView1.TabIndex = 4;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // FrmMain
             // 
+            this.AcceptButton = this.BtnSubmitQuery;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(798, 397);
@@ -75,7 +77,6 @@
             this.Controls.Add(this.TxtQuery);
             this.Name = "FrmMain";
             this.Text = "DB338 0.01 Alpha";
-            this.Load += new System.EventHandler(this.FrmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
