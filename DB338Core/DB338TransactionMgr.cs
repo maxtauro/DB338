@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -128,6 +129,11 @@ namespace DB338Core
             results = tableToSelectFrom.Select(colsToSelect);
             queryResult.Results = results;
             return;
+        }
+
+        public List<IntSchTable> GetTables()
+        {
+            return tables;
         }
 
         private bool ProcessInsertStatement(List<string> tokens)

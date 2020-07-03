@@ -32,6 +32,8 @@
             this.TxtQuery = new System.Windows.Forms.TextBox();
             this.BtnSubmitQuery = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.BtnExport = new System.Windows.Forms.Button();
+            this.BtnImport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,12 +68,33 @@
             this.dataGridView1.Size = new System.Drawing.Size(672, 213);
             this.dataGridView1.TabIndex = 4;
             // 
+            // BtnExport
+            // 
+            this.BtnExport.Location = new System.Drawing.Point(690, 359);
+            this.BtnExport.Name = "BtnExport";
+            this.BtnExport.Size = new System.Drawing.Size(96, 23);
+            this.BtnExport.TabIndex = 5;
+            this.BtnExport.Text = "Export Table";
+            this.BtnExport.UseVisualStyleBackColor = true;
+            this.BtnExport.Click += new System.EventHandler(this.BtnExport_Click);
+            // 
+            // BtnImport
+            // 
+            this.BtnImport.Location = new System.Drawing.Point(691, 330);
+            this.BtnImport.Name = "BtnImport";
+            this.BtnImport.Size = new System.Drawing.Size(95, 23);
+            this.BtnImport.TabIndex = 6;
+            this.BtnImport.Text = "Import Table";
+            this.BtnImport.UseVisualStyleBackColor = true;
+            // 
             // FrmMain
             // 
             this.AcceptButton = this.BtnSubmitQuery;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(798, 397);
+            this.Controls.Add(this.BtnImport);
+            this.Controls.Add(this.BtnExport);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.BtnSubmitQuery);
             this.Controls.Add(this.TxtQuery);
@@ -87,6 +110,8 @@
         private System.Windows.Forms.TextBox TxtQuery;
         private System.Windows.Forms.Button BtnSubmitQuery;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button BtnExport;
+        private System.Windows.Forms.Button BtnImport;
     }
 }
 

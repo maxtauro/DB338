@@ -8,12 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DB338Core;
+using EduDBGUI;
 
 namespace DB338GUI
 {
     public partial class FrmMain : Form
     {
         public DB338 db;
+        private IntSchTable currentTable = null;
 
         public FrmMain()
         {
@@ -38,11 +40,19 @@ namespace DB338GUI
             }
         }
 
+        private void BtnExport_Click(object sender, EventArgs e)
+        {
+            FrmExportMessageBox frmExportMessageBox = new FrmExportMessageBox(db, currentTable);
+            frmExportMessageBox.Show();
+        }
+
         public void Output(IntSchTable results)
         {
             dataGridView1.Rows.Clear();
             dataGridView1.Columns.Clear();
             dataGridView1.Refresh();
+
+            currentTable = results;
 
             if (results == null) return;
 
@@ -70,6 +80,5 @@ namespace DB338GUI
                 }
             }
         }
-
     }
 }

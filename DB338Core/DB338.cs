@@ -53,5 +53,9 @@ namespace DB338Core
             }
         }
 
+        public List<IntSchTable> GetTables()
+        {
+            return transactionMgr.GetTables();
+        }
     }
 }

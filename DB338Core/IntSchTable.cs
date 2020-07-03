@@ -27,7 +27,7 @@ namespace DB338Core
 
         public IntSchTable Select(List<string> columnsToSelect)
         {
-            IntSchTable resultTable = new IntSchTable(this.name, /*allowDuplicateCols=*/ true);
+            IntSchTable resultTable = new IntSchTable("Current Table", /*allowDuplicateCols=*/ true);
             Dictionary<String, List<String>> result = new Dictionary<string, List<string>>();
 
             foreach (string columnToSelect in columnsToSelect)
@@ -76,6 +76,11 @@ namespace DB338Core
             }
 
             return resultTable;
+        }
+
+        public List<string> GetColumns()
+        {
+            return columnNames;
         }
 
         public bool Project()
