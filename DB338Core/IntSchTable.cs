@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace DB338Core
 {
     public class IntSchTable
     {
-
         private string name;
-
         private readonly bool allowDuplicateCols;
 
         public List<string> columnNames = new List<string>();
@@ -78,16 +77,6 @@ namespace DB338Core
             return resultTable;
         }
 
-        public List<string> GetColumns()
-        {
-            return columnNames;
-        }
-
-        public bool Project()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Insert(List<string> cols, List<string> vals)
         {
             for (int i = 0; i < cols.Count; ++i)
@@ -123,6 +112,37 @@ namespace DB338Core
             return true;
         }
 
+        public void WriteToStreamWriter(ref StreamWriter streamWriter)
+        {
+            streamWriter.WriteLine(String.Join(",", this.GetColumnNames()));
+
+            for (int r = 0; r < this.numRows; r++)
+            {
+                List<string> currRow = new List<String>();
+
+                for (int col = 0; col < this.GetColumnNames().Count; ++col)
+                {
+                    string columnName = this.columnNames[col];
+                    IntSchColumn columnEntries = this.GetColumn(columnName);
+
+                    currRow.Add(columnEntries.Get(r));
+                }
+
+                string currRowString = String.Join(",", currRow);
+                streamWriter.WriteLine(currRowString);
+            }
+        }
+
+        public List<string> GetColumnNames()
+        {
+            return columnNames;
+        }
+
+        public int GetColumnCount()
+        {
+            return columnNames.Count;
+        }
+
         public IntSchColumn GetColumn(string name)
         {
             foreach (IntSchColumn col in columns)
@@ -134,6 +154,44 @@ namespace DB338Core
             }
 
             return null;
+        }
+
+        public IntSchColumn GetColumn(int columnIndex)
+        {
+            if (columnIndex >= columns.Count) return null;
+            return columns[columnIndex];
+        }
+
+        public List<string[]> GetRows()
+        {
+            List<string[]> result = new List<string[]>();
+
+            for (int i = 0; i < numRows; ++i)
+            {
+                result[i] = this.GetRow(i);
+            }
+
+            return result;
+        }
+
+        public string[] GetRow(int i)
+        {
+            string[] row = new string[columns.Count];
+
+            for (int col = 0; col < columns.Count; ++col)
+            {
+                string columnName = columnNames[col];
+                IntSchColumn columnEntries = this.GetColumn(columnName);
+
+                row[col] = columnEntries.Get(i);
+            }
+
+            return row;
+        }
+
+        public int GetRowCount()
+        {
+            return numRows;
         }
 
         public bool ContainsColumn(string name)
@@ -148,5 +206,6 @@ namespace DB338Core
 
             return false;
         }
+
     }
 }

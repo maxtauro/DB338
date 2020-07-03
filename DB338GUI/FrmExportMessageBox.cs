@@ -79,25 +79,7 @@ namespace EduDBGUI
             if (savefile.ShowDialog() == DialogResult.OK)
             {
                 StreamWriter streamWriter = new StreamWriter(savefile.FileName);
-
-                streamWriter.WriteLine(String.Join(",", tableToExport.GetColumns()));
-
-                for (int r = 0; r < tableToExport.numRows; r++)
-                {
-                    List<string> currRow = new List<String>();
-
-                    for (int col = 0; col < tableToExport.GetColumns().Count; ++col)
-                    {
-                        string columnName = tableToExport.columnNames[col];
-                        IntSchColumn columnEntries = tableToExport.GetColumn(columnName);
-
-                        currRow.Add(columnEntries.Get(r));
-                    }
-
-                    string currRowString = String.Join(",", currRow);
-                    streamWriter.WriteLine(currRowString);
-                }
-
+                tableToExport.WriteToStreamWriter(ref streamWriter);
                 streamWriter.Close();
                 this.Close();
 
