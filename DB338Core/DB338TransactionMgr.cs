@@ -63,7 +63,6 @@ namespace DB338Core
             // <Select Stm> ::= SELECT <Columns> <From Clause> <Where Clause> <Group Clause> <Having Clause> <Order Clause>\
 
             IntSchTable tableToSelectFrom = null;
-
             IntSchTable results = null;
 
             List<string> colsToSelect = new List<string>();
@@ -87,7 +86,6 @@ namespace DB338Core
             }
 
             string nameOfTableToSelectFrom = tokens[tableOffset];
-
 
             // Validate Table's existence
             for (int i = 0; i < tables.Count; ++i)
@@ -124,9 +122,32 @@ namespace DB338Core
                 return;
             }
 
+            // Parse WHERE clause
+            SQLConditional sqlConditional;
+
+            if (tableOffset + 1 < tokens.Count - 1 && (tokens[tableOffset + 1] == "WHERE" ||  tokens[tableOffset + 1] == "where"))
+            {
+                int whereClauseStart = tableOffset + 2;
+                int whereClauseEnd = whereClauseStart;
+
+                for (; whereClauseEnd < tokens.Count; ++whereClauseEnd)
+                {
+                    // Rough stopping point for now, TODO implement more robust parsing
+                    if (tokens[whereClauseEnd] == "GROUP" || tokens[whereClauseEnd] == "HAVING")
+                    {
+                        break;
+                    }
+                }
+
+                string[] conditionSubArray = tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
+                sqlConditional = new SQLConditional(conditionSubArray);
+            } else
+            {
+                sqlConditional = new SQLConditional(new string[0]);
+            }
 
             // Execute Selection
-            results = tableToSelectFrom.Select(colsToSelect);
+            results = tableToSelectFrom.Select(colsToSelect, sqlConditional);
             queryResult.Results = results;
             return;
         }

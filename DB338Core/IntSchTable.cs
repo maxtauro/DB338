@@ -24,7 +24,7 @@ namespace DB338Core
         public string Name { get => name; set => name = value; }
 
 
-        public IntSchTable Select(List<string> columnsToSelect)
+        public IntSchTable Select(List<string> columnsToSelect, SQLConditional conditional)
         {
             IntSchTable resultTable = new IntSchTable("Current Table", /*allowDuplicateCols=*/ true);
             Dictionary<String, List<String>> result = new Dictionary<string, List<string>>();
@@ -70,8 +70,12 @@ namespace DB338Core
                 {
                     rowVals.Add(result[column][row]);
                 }
-                 
-                resultTable.Insert(resultTable.columnNames, rowVals);
+
+
+                if (conditional.evaluate(this.columnNames.ToArray(), this.GetRow(row)))
+                {
+                    resultTable.Insert(resultTable.columnNames, rowVals);
+                }
             }
 
             return resultTable;

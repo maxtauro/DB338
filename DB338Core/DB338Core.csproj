@@ -48,6 +48,7 @@
     <Compile Include="DB338.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryResult.cs" />
+    <Compile Include="SQLConditional.cs" />
     <Compile Include="SQLParser.cs" />
     <Compile Include="IntSchTable.cs" />
   </ItemGroup>
