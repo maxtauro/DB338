@@ -97,6 +97,30 @@ namespace DB338Core
             numRows++;
         }
 
+
+        public void Delete(SQLConditional sqlConditional)
+        {
+            List<int> rowsToDelete = new List<int>();
+            
+            for (int i = numRows - 1; i >= 0; --i)
+            {
+                if (sqlConditional.evaluate(this.columnNames.ToArray(), GetRow(i)))
+                {
+                    rowsToDelete.Add(i);
+                }
+            }
+
+            foreach(IntSchColumn col in columns)
+            {
+                foreach (int rowIndex in rowsToDelete)
+                {
+                    col.RemoveRow(rowIndex);
+                }
+            }
+
+            numRows -= rowsToDelete.Count;
+        }
+
         public bool AddColumn(string name, string type)
         {
             if (!allowDuplicateCols)

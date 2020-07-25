@@ -20,7 +20,7 @@ namespace DB338Core
 			for (int i = 0; i < conditions.Length;++i)
 			{
 				this.conditions.Add(new Conditional(conditions[i], conditions[i + 1], conditions[i + 2]));
-				while (i < conditions.Length && (conditions[i] != "OR" && conditions[i] != "AND"))
+				while (i < conditions.Length && (conditions[i].ToLower() != "or" && conditions[i].ToLower() != "and"))
                 {
 					i++;
                 }

@@ -41,7 +41,7 @@ namespace DB338Core
             }
             else if (type == "delete")
             {
-                // results = ProcessDeleteStatement(tokens);
+                ProcessDeleteStatement(tokens, ref queryResult);
             }
             else if (type == "drop")
             {
@@ -280,7 +280,7 @@ namespace DB338Core
         private string[,] ProcessUpdateStatement(List<string> tokens)
         {
             throw new NotImplementedException();
-        }
+        } 
 
         private void ProcessDropStatement(List<string> tokens, ref QueryResult queryResult)
         {
@@ -297,9 +297,50 @@ namespace DB338Core
             tables.Remove(tableToDrop);
         }
 
-        private string[,] ProcessDeleteStatement(List<string> tokens)
+        private void ProcessDeleteStatement(List<string> tokens, ref QueryResult queryResult)
         {
-            throw new NotImplementedException();
+            // <Delete Stm> ::= DELETE <From Clause> TABLE <Where Clause>
+            IntSchTable tableToDeleteFrom = null;
+
+            int tableOffset = 0;
+
+            for (int i = 1; i < tokens.Count; ++i)
+            {
+                if (tokens[i] == "from")
+                {
+                    tableOffset = i + 1;
+                    break;
+                }
+            }
+
+            tableToDeleteFrom = GetTable(tokens[tableOffset]);
+
+
+            SQLConditional sqlConditional;
+
+            if (tableOffset + 1 < tokens.Count - 1 && (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
+            {
+                int whereClauseStart = tableOffset + 2;
+                int whereClauseEnd = whereClauseStart;
+
+                for (; whereClauseEnd < tokens.Count; ++whereClauseEnd)
+                {
+                    // Rough stopping point for now, TODO implement more robust parsing
+                    if (tokens[whereClauseEnd] == "GROUP" || tokens[whereClauseEnd] == "HAVING")
+                    {
+                        break;
+                    }
+                }
+
+                string[] conditionSubArray = tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
+                sqlConditional = new SQLConditional(conditionSubArray);
+            }
+            else
+            {
+                sqlConditional = new SQLConditional(new string[0]);
+            }
+
+            tableToDeleteFrom.Delete(sqlConditional);
         }
 
         private string[,] ProcessAlterStatement(List<string> tokens)

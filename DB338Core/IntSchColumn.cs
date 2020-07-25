@@ -22,5 +22,10 @@ namespace DB338Core
         }
 
         public string Name { get => name; set => name = value; }
+
+        public void RemoveRow(int i)
+        {
+            items.RemoveAt(i);
+        }
     }
 }
