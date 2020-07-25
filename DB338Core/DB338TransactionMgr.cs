@@ -45,7 +45,7 @@ namespace DB338Core
             }
             else if (type == "drop")
             {
-                // results = ProcessDropStatement(tokens);
+                 ProcessDropStatement(tokens, ref queryResult);
             }
             else if (type == "update")
             {
@@ -282,9 +282,19 @@ namespace DB338Core
             throw new NotImplementedException();
         }
 
-        private string[,] ProcessDropStatement(List<string> tokens)
+        private void ProcessDropStatement(List<string> tokens, ref QueryResult queryResult)
         {
-            throw new NotImplementedException();
+            string nameOfTableToDrop = tokens[2];
+            IntSchTable tableToDrop = GetTable(nameOfTableToDrop);
+
+            //TODO make error message more verbose.
+            if (tableToDrop == null)
+            {
+                queryResult.Error = "Could not find table: " + nameOfTableToDrop;
+                return;
+            }
+
+            tables.Remove(tableToDrop);
         }
 
         private string[,] ProcessDeleteStatement(List<string> tokens)
@@ -295,6 +305,19 @@ namespace DB338Core
         private string[,] ProcessAlterStatement(List<string> tokens)
         {
             throw new NotImplementedException();
+        }
+
+        private IntSchTable GetTable(string tableName)
+        {
+            for (int i = 0; i < tables.Count; ++i)
+            {
+                if (tables[i].Name == tableName)
+                {
+                   return tables[i];
+                }
+            }
+
+            return null;
         }
     }
 }
