@@ -86,6 +86,7 @@
             this.BtnImport.TabIndex = 6;
             this.BtnImport.Text = "Import Table";
             this.BtnImport.UseVisualStyleBackColor = true;
+            this.BtnImport.Click += new System.EventHandler(this.BtnImport_Click);
             // 
             // FrmMain
             // 

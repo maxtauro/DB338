@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -46,6 +48,36 @@ namespace DB338GUI
             frmExportMessageBox.Show();
         }
 
+        private void BtnImport_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog()
+            {
+                Filter = "CSVs (*.csv)|*.csv",
+                Title = "Import CSV file"
+            };
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var sr = new StreamReader(openFileDialog1.FileName);
+                    var createdTableName =  db.CreateTableFromImport(openFileDialog1.FileName, sr.ReadToEnd());
+
+                    var selectQuery = "select * from " + createdTableName;
+
+                    QueryResult queryResult = db.SubmitQuery(selectQuery);
+                    IntSchTable queryResults = queryResult.Results;
+                    
+                    Output(queryResults);
+                }
+                catch (SecurityException ex)
+                {
+                    MessageBox.Show($"Security error.\n\nError message: {ex.Message}\n\n" +
+                    $"Details:\n\n{ex.StackTrace}");
+                }
+            }
+        }
+
         public void Output(IntSchTable results)
         {
             dataGridView1.Rows.Clear();
@@ -80,5 +112,7 @@ namespace DB338GUI
                 }
             }
         }
+
+ 
     }
 }

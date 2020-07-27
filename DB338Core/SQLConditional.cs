@@ -8,7 +8,7 @@ namespace DB338Core
 	public class SQLConditional
 	{
 		private List<Conditional> conditions = new List<Conditional>();
-
+		 
 		/*
 		 * This class will be used to evaluate basic conditionals for our SQL statements
 		 * For now, this class will only evaluate conditionals with OR statements and equality
