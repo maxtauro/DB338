@@ -19,6 +19,12 @@ namespace DB338GUI
         public DB338 db;
         private IntSchTable currentTable = null;
 
+        private OpenFileDialog openFileDialog = new OpenFileDialog()
+        {
+            Filter = "CSVs (*.csv)|*.csv",
+            Title = "Import CSV file"
+        };
+        
         public FrmMain()
         {
             InitializeComponent();
@@ -50,31 +56,18 @@ namespace DB338GUI
 
         private void BtnImport_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog()
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            try
             {
-                Filter = "CSVs (*.csv)|*.csv",
-                Title = "Import CSV file"
-            };
+                var sr = new StreamReader(openFileDialog.FileName);
+                var createdTable =  db.CreateTableFromImport(openFileDialog.FileName, sr.ReadToEnd());
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                Output(createdTable);
+            }
+            catch (SecurityException ex)
             {
-                try
-                {
-                    var sr = new StreamReader(openFileDialog1.FileName);
-                    var createdTableName =  db.CreateTableFromImport(openFileDialog1.FileName, sr.ReadToEnd());
-
-                    var selectQuery = "select * from " + createdTableName;
-
-                    QueryResult queryResult = db.SubmitQuery(selectQuery);
-                    IntSchTable queryResults = queryResult.Results;
-                    
-                    Output(queryResults);
-                }
-                catch (SecurityException ex)
-                {
-                    MessageBox.Show($"Security error.\n\nError message: {ex.Message}\n\n" +
-                    $"Details:\n\n{ex.StackTrace}");
-                }
+                MessageBox.Show($"Security error.\n\nError message: {ex.Message}\n\n" +
+                                $"Details:\n\n{ex.StackTrace}");
             }
         }
 

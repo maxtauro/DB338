@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms.VisualStyles;
 
@@ -58,26 +59,67 @@ namespace DB338Core
             return transactionMgr.GetTables();
         }
 
-        public string CreateTableFromImport(string tableName, string tableImport)
+        public IntSchTable CreateTableFromImport(string importName, string importContents)
         {
-            // create table test(col1 whatever, col2 whatever, col3 whatever)
-            string[] tableSplit = tableImport.Split(
-                new[] { "\r\n", "\r", "\n" },
+            // TODO validate that the csv is in a valid format
+
+            // Split the imported csv by line
+            string[] tableContents = importContents.Split(
+                new[] {"\r\n", "\r", "\n"},
                 StringSplitOptions.None
             );
 
-            string[] columnNames = tableSplit[0].Split(',');
+            string[] columnNames = tableContents[0].Split(',');
 
-            char[] tableNameChar = Array.FindAll<char>(Path.GetFileName(tableName).Split('.')[0].ToCharArray(), (c => (char.IsLetterOrDigit(c))));
+            string tableNameToCreate = GetNewTableName(importName);
+            string newTableCreateStatement =
+                GetCreateStatementForNewTable(tableNameToCreate, columnNames);
+            string[] insertStatements = GenerateInsertStatements(tableNameToCreate, columnNames, tableContents);
 
-            string tableNameToCreate = new string(tableNameChar);
-
-            int numDuplicates = 0;
-            while (transactionMgr.GetTables().FindIndex(table => table.Name == tableNameToCreate) >= 0)
+            SubmitQuery(newTableCreateStatement);
+            foreach (string insertStatement in insertStatements)
             {
-                tableNameToCreate += ++numDuplicates;
+                SubmitQuery(insertStatement);
             }
 
+            IntSchTable createdTable = GetTable(tableNameToCreate);
+
+            return createdTable;
+        }
+
+        private IntSchTable GetTable(string tableName)
+        {
+            var tables = GetTables();
+            return tables.FirstOrDefault(table => table.Name == tableName);
+        }
+
+        private string[] GenerateInsertStatements(string tableName, string[] columnNames, string[] importContents)
+        {
+            string[] insertStatements = new string[importContents.Length - 1];
+            StringBuilder insertStatementBuilder = new StringBuilder();
+
+            for (int i = 1; i < importContents.Length; ++i)
+            {
+                insertStatementBuilder.Append("insert into ");
+                insertStatementBuilder.Append(tableName);
+                insertStatementBuilder.Append("(");
+                insertStatementBuilder.Append(string.Join(", ", columnNames));
+                insertStatementBuilder.Append(") ");
+                insertStatementBuilder.Append("values");
+                insertStatementBuilder.Append("(");
+                insertStatementBuilder.Append(importContents[i]);
+                insertStatementBuilder.Append(") ");
+
+                insertStatements[i - 1] = insertStatementBuilder.ToString();
+
+                insertStatementBuilder.Clear();
+            }
+
+            return insertStatements;
+        }
+
+        private string GetCreateStatementForNewTable(string tableNameToCreate, string[] columnNames)
+        {
             StringBuilder createStatmentBuilder = new StringBuilder();
 
             createStatmentBuilder.Append("create table ");
@@ -90,7 +132,8 @@ namespace DB338Core
                 if (i != columnNames.Length - 1)
                 {
                     createStatmentBuilder.Append(columnNames[i] + " whatever, ");
-                } else
+                }
+                else
                 {
                     createStatmentBuilder.Append(columnNames[i] + " whatever");
                 }
@@ -98,25 +141,27 @@ namespace DB338Core
 
             createStatmentBuilder.Append(")");
 
-            SubmitQuery(createStatmentBuilder.ToString());
+            return createStatmentBuilder.ToString();
+        }
 
-            StringBuilder insertStatementBuilder = new StringBuilder();
+        private string GetNewTableName(string tableName)
+        {
+            char[] tableNameChar = Array.FindAll<char>(Path.GetFileName(tableName).Split('.')[0].ToCharArray(),
+                (c => (char.IsLetterOrDigit(c))));
 
-            for (int i = 1; i < tableSplit.Length; ++i)
+            string tableNameToCreate = new string(tableNameChar);
+
+            int numDuplicates = 0;
+            while (transactionMgr.GetTables().FindIndex(table => table.Name == tableNameToCreate) >= 0)
             {
-                insertStatementBuilder.Append("insert into ");
-                insertStatementBuilder.Append(tableNameToCreate);
-                insertStatementBuilder.Append("(");
-                insertStatementBuilder.Append(string.Join(", ", columnNames));
-                insertStatementBuilder.Append(") ");
-                insertStatementBuilder.Append("values");
-                insertStatementBuilder.Append("(");
-                insertStatementBuilder.Append(tableSplit[i]);
-                insertStatementBuilder.Append(") ");
-
-                SubmitQuery(insertStatementBuilder.ToString());
-
-                insertStatementBuilder.Clear();
+                if (numDuplicates == 0)
+                {
+                    tableNameToCreate = tableNameToCreate + ++numDuplicates;
+                }
+                else
+                {
+                    tableNameToCreate = new string(tableNameChar) + ++numDuplicates;
+                }
             }
 
             return tableNameToCreate;
