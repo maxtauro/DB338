@@ -27,5 +27,10 @@ namespace DB338Core
         {
             items.RemoveAt(i);
         }
+
+        public void SetEntryAt(int i, string ValueToSet)
+        {
+            items[i] = ValueToSet;
+        }
     }
 }

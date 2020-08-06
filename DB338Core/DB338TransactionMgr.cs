@@ -33,11 +33,11 @@ namespace DB338Core
             }
             else if (type == "select")
             {
-               ProcessSelectStatement(tokens, ref queryResult);
+                ProcessSelectStatement(tokens, ref queryResult);
             }
             else if (type == "alter")
             {
-               // results = ProcessAlterStatement(tokens);
+                // results = ProcessAlterStatement(tokens);
             }
             else if (type == "delete")
             {
@@ -45,17 +45,16 @@ namespace DB338Core
             }
             else if (type == "drop")
             {
-                 ProcessDropStatement(tokens, ref queryResult);
+                ProcessDropStatement(tokens, ref queryResult);
             }
             else if (type == "update")
             {
-                // results = ProcessUpdateStatement(tokens);
+                ProcessUpdateStatement(tokens, ref queryResult);
             }
             else
             {
                 results = null;
             }
-            //other parts of SQL to do...
         }
 
         private void ProcessSelectStatement(List<string> tokens, ref QueryResult queryResult)
@@ -105,15 +104,14 @@ namespace DB338Core
 
 
             // Validate Columns
-            List<string> missingColumns = new List<string>();           
+            List<string> missingColumns = new List<string>();
 
             foreach (string column in colsToSelect)
             {
-            if (column != "*" && !tableToSelectFrom.ContainsColumn(column))
+                if (column != "*" && !tableToSelectFrom.ContainsColumn(column))
                 {
                     missingColumns.Add(column);
                 }
-
             }
 
             if (missingColumns.Count != 0)
@@ -125,7 +123,8 @@ namespace DB338Core
             // Parse WHERE clause
             SQLConditional sqlConditional;
 
-            if (tableOffset + 1 < tokens.Count - 1 && (tokens[tableOffset + 1] == "WHERE" ||  tokens[tableOffset + 1] == "where"))
+            if (tableOffset + 1 < tokens.Count - 1 &&
+                (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
             {
                 int whereClauseStart = tableOffset + 2;
                 int whereClauseEnd = whereClauseStart;
@@ -139,9 +138,11 @@ namespace DB338Core
                     }
                 }
 
-                string[] conditionSubArray = tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
+                string[] conditionSubArray =
+                    tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
                 sqlConditional = new SQLConditional(conditionSubArray);
-            } else
+            }
+            else
             {
                 sqlConditional = new SQLConditional(new string[0]);
             }
@@ -277,10 +278,82 @@ namespace DB338Core
             return true;
         }
 
-        private string[,] ProcessUpdateStatement(List<string> tokens)
+        private void ProcessUpdateStatement(List<string> tokens, ref QueryResult queryResult)
         {
-            throw new NotImplementedException();
-        } 
+            // UPDATE table_name
+            // SET column1 = value1, column2 = value2, ...
+            // WHERE condition;
+            string nameOfTableToUpdate = tokens[1];
+
+            List<string> columnsToUpdate = new List<string>();
+            List<string> updatedValues = new List<string>();
+
+            ParseUpdates(tokens, ref columnsToUpdate, ref updatedValues);
+
+            SQLConditional conditional = ParseWhereClause(tokens);
+
+            // Validate update columns
+            
+            // Validate conditional columns
+            
+            IntSchTable tableToUpdate = GetTable(nameOfTableToUpdate);
+
+            tableToUpdate.Update(columnsToUpdate, updatedValues, conditional);
+        }
+
+        private void ParseUpdates(List<string> tokens, ref List<string> columnsToUpdate,
+            ref List<string> updatedValues)
+        {
+            int setIndex = tokens.FindIndex(it => it == "SET" || it == "set");
+            int whereIndex = tokens.FindIndex(it => it == "WHERE" || it == "where");
+            int endIndex = whereIndex;
+
+            if (endIndex == -1)
+            {
+                endIndex = tokens.Count;
+            }
+            
+            for (int i = setIndex + 1; i < endIndex; i+=4)
+            {
+                columnsToUpdate.Add(tokens[i]);
+                updatedValues.Add(tokens[i + 2]);
+            }
+        }
+
+        private SQLConditional ParseWhereClause(List<string> tokens)
+        {
+            SQLConditional conditional;
+
+            int whereIndex = 0;
+
+            while (whereIndex < tokens.Count && tokens[whereIndex] != "WHERE" && tokens[whereIndex] != "where")
+            {
+                whereIndex++;
+            }
+            
+            if (whereIndex < tokens.Count - 1)
+            {
+                int whereClauseStart = whereIndex + 1;
+                int whereClauseEnd = whereClauseStart;
+
+                for (; whereClauseEnd < tokens.Count; ++whereClauseEnd)
+                {
+                    // Rough stopping point for now, TODO implement more robust parsing
+                    if (tokens[whereClauseEnd] == "GROUP" || tokens[whereClauseEnd] == "HAVING")
+                    {
+                        break;
+                    }
+                }
+
+                string[] conditionSubArray =
+                    tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
+                return new SQLConditional(conditionSubArray);
+            }
+            else
+            {
+                return new SQLConditional(new string[0]);
+            }
+        }
 
         private void ProcessDropStatement(List<string> tokens, ref QueryResult queryResult)
         {
@@ -318,7 +391,8 @@ namespace DB338Core
 
             SQLConditional sqlConditional;
 
-            if (tableOffset + 1 < tokens.Count - 1 && (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
+            if (tableOffset + 1 < tokens.Count - 1 &&
+                (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
             {
                 int whereClauseStart = tableOffset + 2;
                 int whereClauseEnd = whereClauseStart;
@@ -332,7 +406,8 @@ namespace DB338Core
                     }
                 }
 
-                string[] conditionSubArray = tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
+                string[] conditionSubArray =
+                    tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
                 sqlConditional = new SQLConditional(conditionSubArray);
             }
             else
@@ -354,7 +429,7 @@ namespace DB338Core
             {
                 if (tables[i].Name == tableName)
                 {
-                   return tables[i];
+                    return tables[i];
                 }
             }
 

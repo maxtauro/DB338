@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace DB338Core
@@ -196,7 +197,7 @@ namespace DB338Core
 
             for (int i = 0; i < numRows; ++i)
             {
-                result[i] = this.GetRow(i);
+                result.Add(GetRow(i));
             }
 
             return result;
@@ -209,7 +210,7 @@ namespace DB338Core
             for (int col = 0; col < columns.Count; ++col)
             {
                 string columnName = columnNames[col];
-                IntSchColumn columnEntries = this.GetColumn(columnName);
+                IntSchColumn columnEntries = GetColumn(columnName);
 
                 row[col] = columnEntries.Get(i);
             }
@@ -235,5 +236,29 @@ namespace DB338Core
             return false;
         }
 
+        public void Update(List<string> columnsToUpdate, List<string> updatedValues, SQLConditional conditional)
+        {
+            List<string[]> rows = GetRows();
+            string[] columnNames = GetColumnNames().ToArray();
+            
+            for (int i = 0; i < rows.Count; ++i)
+            {
+                if (conditional.evaluate(columnNames, rows[i]))
+                {
+                    foreach (var colNameAndValue in columnsToUpdate.Zip(updatedValues, Tuple.Create))
+                    {
+                        string columnToUpdate = colNameAndValue.Item1;
+                        string valueToSet = colNameAndValue.Item2;
+                        SetEntry(columnToUpdate, i, valueToSet);
+                    }
+                }
+            }
+        }
+
+        private void SetEntry(string ColumnName, int RowIndex, string ValueToSet)
+        {
+            IntSchColumn columnToUpdate = GetColumn(ColumnName);
+            columnToUpdate.SetEntryAt(RowIndex, ValueToSet);
+        }
     }
 }
