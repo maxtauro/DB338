@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DB338Core
@@ -49,6 +50,11 @@ namespace DB338Core
 
             float avg = sum / items.Count;
             return avg.ToString();
+        }
+
+        public string GetMax()
+        {
+            return items.Max();
         }
     }
 }

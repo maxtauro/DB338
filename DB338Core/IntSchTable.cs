@@ -102,12 +102,31 @@ namespace DB338Core
 
                 if (isFunction)
                 {
+                    string functionResult;
+                    
                     if (functionName == "avg")
                     {
-                        string columnAverage = resultTableColumn.GetAverage();
-                        resultTableColumn.items[0] = columnAverage;
-                        resultTable.numRows = 1;
+                        functionResult = resultTableColumn.GetAverage();
                     }
+                    else if (functionName == "max")
+                    {
+                        functionResult = resultTableColumn.GetMax();
+                    }
+                    else if (functionName == "min")
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (functionName == "sum")
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid function: " + functionName);
+                    }
+                    
+                    resultTableColumn.items[0] = functionResult;
+                    resultTable.numRows = 1;
                 }
             }
 
