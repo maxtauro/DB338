@@ -16,21 +16,39 @@ namespace DB338Core
 
             items = new List<string>();
         }
+
         public string Get(int pos)
         {
             return items[pos];
         }
 
-        public string Name { get => name; set => name = value; }
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        }
 
         public void RemoveRow(int i)
         {
             items.RemoveAt(i);
         }
 
-        public void SetEntryAt(int i, string ValueToSet)
+        public void SetEntryAt(int i, string valueToSet)
         {
-            items[i] = ValueToSet;
+            items[i] = valueToSet;
+        }
+
+        public string GetAverage()
+        {
+            float sum = 0;
+            foreach (string item in items)
+            {
+                float n = float.Parse(item);
+                sum += n;
+            }
+
+            float avg = sum / items.Count;
+            return avg.ToString();
         }
     }
 }

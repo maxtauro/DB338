@@ -22,7 +22,11 @@ namespace DB338Core
             this.allowDuplicateCols = allowDuplicateCols;
         }
 
-        public string Name { get => name; set => name = value; }
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        }
 
 
         public IntSchTable Select(List<string> columnsToSelect, SQLConditional conditional)
@@ -50,10 +54,21 @@ namespace DB338Core
             foreach (IntSchColumn columnToSelect in resultTable.columns)
             {
                 string columnName = columnToSelect.Name;
+                string functionName = null;
+                string functionParameter = null;
 
+                bool isFunction = IsSelectionFunction(columnName, ref functionName, ref functionParameter);
+                
                 for (int i = 0; i < columns.Count; ++i)
                 {
-                    if (columnName == columns[i].Name)
+                    string resultColumnName = columnName;
+
+                    if (isFunction)
+                    {
+                        resultColumnName = functionParameter;
+                    } 
+                 
+                    if (resultColumnName == columns[i].Name)
                     {
                         for (int z = 0; z < columns[i].items.Count; ++z)
                         {
@@ -71,15 +86,86 @@ namespace DB338Core
                 {
                     rowVals.Add(result[column][row]);
                 }
-
-
+                
                 if (conditional.evaluate(this.columnNames.ToArray(), this.GetRow(row)))
                 {
                     resultTable.Insert(resultTable.columnNames, rowVals);
                 }
             }
+            
+            foreach (IntSchColumn resultTableColumn in resultTable.columns)
+            {
+                string functionName = null;
+                string functionParameter = null;
+
+                bool isFunction = IsSelectionFunction(resultTableColumn.Name, ref functionName, ref functionParameter);
+
+                if (isFunction)
+                {
+                    if (functionName == "avg")
+                    {
+                        string columnAverage = resultTableColumn.GetAverage();
+                        resultTableColumn.items[0] = columnAverage;
+                        resultTable.numRows = 1;
+                    }
+                }
+            }
 
             return resultTable;
+        }
+
+        private string GetColumnAverage(string columnName)
+        {
+            IntSchColumn column = GetColumn(columnName);
+            return column.GetAverage();
+        }
+
+        private bool IsSelectionFunction(string columnName, ref string functionName, ref string functionParameter)
+        {
+            if (columnName.Length < 5) return false;
+
+            // Check if the first three chars are: Max, Min, Avg, Sum
+            string potentialFunctionName = columnName.Substring(0, 3).ToLower();
+
+            if (potentialFunctionName == "max" || potentialFunctionName == "min" || potentialFunctionName == "avg" ||
+                potentialFunctionName == "sum")
+            {
+                functionName = potentialFunctionName;
+                functionParameter = columnName.Substring(4, columnName.Length - 5);
+                return true;
+            }
+
+            if (columnName.Length < 6)
+            {
+                return false;
+            }
+
+            // Check if function is Last
+            potentialFunctionName = columnName.Substring(0, 4).ToLower();
+
+            if (potentialFunctionName == "last")
+            {
+                functionName = potentialFunctionName;
+                functionParameter = columnName.Substring(6, columnName.Length - 7);
+                return true;
+            }
+
+            if (columnName.Length < 7)
+            {
+                return false;
+            }
+
+            // Check if function is First or Count
+            potentialFunctionName = columnName.Substring(0, 5).ToLower();
+
+            if (potentialFunctionName == "first" || potentialFunctionName == "count")
+            {
+                functionName = potentialFunctionName;
+                functionParameter = columnName.Substring(7, columnName.Length - 8);
+                return true;
+            }
+
+            return false;
         }
 
         public void Insert(List<string> cols, List<string> vals)
@@ -102,7 +188,7 @@ namespace DB338Core
         public void Delete(SQLConditional sqlConditional)
         {
             List<int> rowsToDelete = new List<int>();
-            
+
             for (int i = numRows - 1; i >= 0; --i)
             {
                 if (sqlConditional.evaluate(this.columnNames.ToArray(), GetRow(i)))
@@ -111,7 +197,7 @@ namespace DB338Core
                 }
             }
 
-            foreach(IntSchColumn col in columns)
+            foreach (IntSchColumn col in columns)
             {
                 foreach (int rowIndex in rowsToDelete)
                 {
@@ -134,7 +220,7 @@ namespace DB338Core
                     }
                 }
             }
-            
+
             columnNames.Add(name);
             columns.Add(new IntSchColumn(name, type));
 
@@ -240,7 +326,7 @@ namespace DB338Core
         {
             List<string[]> rows = GetRows();
             string[] columnNames = GetColumnNames().ToArray();
-            
+
             for (int i = 0; i < rows.Count; ++i)
             {
                 if (conditional.evaluate(columnNames, rows[i]))

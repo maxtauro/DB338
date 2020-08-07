@@ -65,6 +65,7 @@ namespace DB338Core
             IntSchTable results = null;
 
             List<string> colsToSelect = new List<string>();
+            List<string> colsToValidate = new List<string>();
             int tableOffset = 0;
 
             for (int i = 1; i < tokens.Count; ++i)
@@ -77,10 +78,22 @@ namespace DB338Core
                 else if (tokens[i] == ",")
                 {
                     continue;
+                } else if (tokens[i].ToLower() == "avg")
+                {
+                    if (tokens[i + 2] == "*")
+                    {
+                        queryResult.Error = "Invalid arguments for function " + tokens[i];
+                        return;
+                    }
+                    
+                    colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
+                    colsToValidate.Add(tokens[i + 2]);
+                    i += 3;
                 }
                 else
                 {
                     colsToSelect.Add(tokens[i]);
+                    colsToValidate.Add(tokens[i]);
                 }
             }
 
@@ -106,7 +119,7 @@ namespace DB338Core
             // Validate Columns
             List<string> missingColumns = new List<string>();
 
-            foreach (string column in colsToSelect)
+            foreach (string column in colsToValidate)
             {
                 if (column != "*" && !tableToSelectFrom.ContainsColumn(column))
                 {
@@ -116,7 +129,7 @@ namespace DB338Core
 
             if (missingColumns.Count != 0)
             {
-                queryResult.Error = "Could not find columns: " + missingColumns;
+                queryResult.Error = "Could not find columns: " + String.Join(",", missingColumns);
                 return;
             }
 
