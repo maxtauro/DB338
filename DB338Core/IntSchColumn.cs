@@ -73,5 +73,10 @@ namespace DB338Core
 
             return sum.ToString();
         }
+
+        public string GetCount()
+        {
+            return items.Count.ToString();
+        }
     }
 }

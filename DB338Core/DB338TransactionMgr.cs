@@ -91,6 +91,11 @@ namespace DB338Core
                     colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
                     colsToValidate.Add(tokens[i + 2]);
                     i += 3;
+                } else if (i + 3 < tokens.Count && tokens[i].ToLower() == "count")
+                {
+                    colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
+                    colsToValidate.Add(tokens[i + 2]);
+                    i += 3; 
                 }
                 else
                 {

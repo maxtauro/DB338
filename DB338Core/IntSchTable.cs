@@ -65,7 +65,17 @@ namespace DB338Core
 
                     if (isFunction)
                     {
-                        resultColumnName = functionParameter;
+                        // Since COUNT returns the number of records, we simply
+                        // count the first column of the table
+                        if (functionName == "count")
+                        {
+                            resultColumnName = columnNames[0];
+                        }
+                        else
+                        {
+                            resultColumnName = functionParameter; 
+                        }
+                        
                     } 
                  
                     if (resultColumnName == columns[i].Name)
@@ -120,6 +130,10 @@ namespace DB338Core
                     {
                         functionResult = resultTableColumn.GetSum();
                     }
+                    else if (functionName == "count")
+                    {
+                        functionResult = resultTableColumn.GetCount();
+                    }
                     else
                     {
                         throw new ArgumentException("Invalid function: " + functionName);
@@ -159,25 +173,10 @@ namespace DB338Core
                 return false;
             }
 
-            // Check if function is Last
-            potentialFunctionName = columnName.Substring(0, 4).ToLower();
-
-            if (potentialFunctionName == "last")
-            {
-                functionName = potentialFunctionName;
-                functionParameter = columnName.Substring(6, columnName.Length - 7);
-                return true;
-            }
-
-            if (columnName.Length < 7)
-            {
-                return false;
-            }
-
-            // Check if function is First or Count
+            // Check if function is Count
             potentialFunctionName = columnName.Substring(0, 5).ToLower();
 
-            if (potentialFunctionName == "first" || potentialFunctionName == "count")
+            if (potentialFunctionName == "count")
             {
                 functionName = potentialFunctionName;
                 functionParameter = columnName.Substring(7, columnName.Length - 8);
