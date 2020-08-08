@@ -78,14 +78,16 @@ namespace DB338Core
                 else if (tokens[i] == ",")
                 {
                     continue;
-                } else if (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max" || tokens[i].ToLower() == "min")
+                }
+                else if (i + 3 < tokens.Count && (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max" || tokens[i].ToLower() == "min" ||
+                         tokens[i].ToLower() == "sum"))
                 {
                     if (tokens[i + 2] == "*")
                     {
                         queryResult.Error = "Invalid arguments for function " + tokens[i];
                         return;
                     }
-                    
+
                     colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
                     colsToValidate.Add(tokens[i + 2]);
                     i += 3;
@@ -306,9 +308,9 @@ namespace DB338Core
             SQLConditional conditional = ParseWhereClause(tokens);
 
             // Validate update columns
-            
+
             // Validate conditional columns
-            
+
             IntSchTable tableToUpdate = GetTable(nameOfTableToUpdate);
 
             tableToUpdate.Update(columnsToUpdate, updatedValues, conditional);
@@ -325,8 +327,8 @@ namespace DB338Core
             {
                 endIndex = tokens.Count;
             }
-            
-            for (int i = setIndex + 1; i < endIndex; i+=4)
+
+            for (int i = setIndex + 1; i < endIndex; i += 4)
             {
                 columnsToUpdate.Add(tokens[i]);
                 updatedValues.Add(tokens[i + 2]);
@@ -343,7 +345,7 @@ namespace DB338Core
             {
                 whereIndex++;
             }
-            
+
             if (whereIndex < tokens.Count - 1)
             {
                 int whereClauseStart = whereIndex + 1;

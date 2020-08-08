@@ -61,5 +61,17 @@ namespace DB338Core
         {
             return items.Min();
         }
+
+        public string GetSum()
+        {
+            float sum = 0;
+            foreach (string item in items)
+            {
+                float n = float.Parse(item);
+                sum += n;
+            }
+
+            return sum.ToString();
+        }
     }
 }

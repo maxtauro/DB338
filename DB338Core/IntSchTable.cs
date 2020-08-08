@@ -118,7 +118,7 @@ namespace DB338Core
                     }
                     else if (functionName == "sum")
                     {
-                        throw new NotImplementedException();
+                        functionResult = resultTableColumn.GetSum();
                     }
                     else
                     {
