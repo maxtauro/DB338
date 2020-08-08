@@ -114,7 +114,7 @@ namespace DB338Core
                     }
                     else if (functionName == "min")
                     {
-                        throw new NotImplementedException();
+                        functionResult = resultTableColumn.GetMin();
                     }
                     else if (functionName == "sum")
                     {

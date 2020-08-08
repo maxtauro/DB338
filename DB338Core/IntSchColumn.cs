@@ -56,5 +56,10 @@ namespace DB338Core
         {
             return items.Max();
         }
+
+        public string GetMin()
+        {
+            return items.Min();
+        }
     }
 }

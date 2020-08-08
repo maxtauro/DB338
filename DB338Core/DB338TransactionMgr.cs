@@ -78,7 +78,7 @@ namespace DB338Core
                 else if (tokens[i] == ",")
                 {
                     continue;
-                } else if (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max")
+                } else if (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max" || tokens[i].ToLower() == "min")
                 {
                     if (tokens[i + 2] == "*")
                     {
