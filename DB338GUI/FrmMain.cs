@@ -24,7 +24,7 @@ namespace DB338GUI
             Filter = "CSVs (*.csv)|*.csv",
             Title = "Import CSV file"
         };
-        
+
         public FrmMain()
         {
             InitializeComponent();
@@ -33,11 +33,13 @@ namespace DB338GUI
 
         private void BtnSubmitQuery_Click(object sender, EventArgs e)
         {
-            string[] queries = TxtQuery.Text.Split(';');
+            string[] trimmedLines = GetTrimmedLines();
+
+            string[] queries = String.Join(" ", trimmedLines).Split(';');
             for (int i = 0; i < queries.Length; ++i)
             {
                 if (queries[i] == "") continue;
-                
+
                 QueryResult queryResult = db.SubmitQuery(queries[i]);
                 IntSchTable queryResults = queryResult.Results;
                 if (queryResult.Error != "none")
@@ -45,10 +47,23 @@ namespace DB338GUI
                     //null means error
                     MessageBox.Show("Input SQL contained a " + queryResult.Error + " error.");
                 }
-                else {
+                else
+                {
                     Output(queryResults);
                 }
             }
+        }
+
+        private string[] GetTrimmedLines()
+        {
+            string[] trimmedLines = new string[TxtQuery.Lines.Length];
+            for (int i = 0; i < TxtQuery.Lines.Length; ++i)
+            {
+                int commentIndex = TxtQuery.Lines[i].IndexOf("--");
+                trimmedLines[i] = commentIndex >= 0 ? TxtQuery.Lines[i].Substring(0, commentIndex) : TxtQuery.Lines[i];
+            }
+
+            return trimmedLines;
         }
 
         private void BtnExport_Click(object sender, EventArgs e)
@@ -63,7 +78,7 @@ namespace DB338GUI
             try
             {
                 var sr = new StreamReader(openFileDialog.FileName);
-                var createdTable =  db.CreateTableFromImport(openFileDialog.FileName, sr.ReadToEnd());
+                var createdTable = db.CreateTableFromImport(openFileDialog.FileName, sr.ReadToEnd());
 
                 Output(createdTable);
             }
@@ -108,7 +123,5 @@ namespace DB338GUI
                 }
             }
         }
-
- 
     }
 }
