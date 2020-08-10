@@ -33,9 +33,12 @@ namespace DB338GUI
 
         private void BtnSubmitQuery_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < TxtQuery.Lines.Length; ++i)
+            string[] queries = TxtQuery.Text.Split(';');
+            for (int i = 0; i < queries.Length; ++i)
             {
-                QueryResult queryResult = db.SubmitQuery(TxtQuery.Lines[i]);
+                if (queries[i] == "") continue;
+                
+                QueryResult queryResult = db.SubmitQuery(queries[i]);
                 IntSchTable queryResults = queryResult.Results;
                 if (queryResult.Error != "none")
                 {
