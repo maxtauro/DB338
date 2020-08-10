@@ -10,11 +10,13 @@ namespace DB338Core
 {
     public class DB338
     {
+        public Action OnDbUpdated { get; private set; }
         private SQLParser sqlParser;
         private DB338TransactionMgr transactionMgr;
 
-        public DB338()
+        public DB338(Action onDbUpdated)
         {
+            OnDbUpdated = onDbUpdated;
             sqlParser = new SQLParser();
             sqlParser.Setup();
             transactionMgr = new DB338TransactionMgr();
@@ -43,6 +45,7 @@ namespace DB338Core
             {
                 QueryResult queryResult = new QueryResult(queryType, done, accepted, error);
                 transactionMgr.Process(tokens, queryType, ref queryResult);
+                OnDbUpdated();
                 return queryResult;
             }
             else

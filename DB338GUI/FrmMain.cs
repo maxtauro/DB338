@@ -25,19 +25,42 @@ namespace DB338GUI
         {
             InitializeComponent();
             SetupSyntaxHighlighting();
-            db = new DB338();
+            db = new DB338(UpdateAutoComplete);
         }
 
         private void SetupSyntaxHighlighting()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
-            this.TxtQuery.SyntaxHighlighter.KeywordStyle = (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
-            this.TxtQuery.SyntaxHighlighter.TypesStyle = (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
-            this.TxtQuery.SyntaxHighlighter.StatementsStyle =  (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
-            this.TxtQuery.SyntaxHighlighter.NumberStyle =  (Style) new TextStyle(Brushes.LightSkyBlue, (Brush) null, FontStyle.Regular);
-            this.TxtQuery.SyntaxHighlighter.StringStyle =  (Style) new TextStyle(Brushes.DarkSeaGreen, (Brush) null, FontStyle.Regular);
-            this.TxtQuery.SyntaxHighlighter.FunctionsStyle = (Style) new TextStyle(Brushes.Goldenrod, (Brush) null, FontStyle.Italic);
+            System.ComponentModel.ComponentResourceManager resources =
+                new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
+            this.TxtQuery.SyntaxHighlighter.KeywordStyle =
+                (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.TypesStyle =
+                (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.StatementsStyle =
+                (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.NumberStyle =
+                (Style) new TextStyle(Brushes.LightSkyBlue, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.StringStyle =
+                (Style) new TextStyle(Brushes.DarkSeaGreen, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.FunctionsStyle =
+                (Style) new TextStyle(Brushes.Goldenrod, (Brush) null, FontStyle.Italic);
             this.TxtQuery.Text = resources.GetString("TxtQuery.Text");
+        }
+
+        private void UpdateAutoComplete()
+        {
+            List<string> autoCompleteList = new List<string>()
+            {
+                "SELECT", "FROM", "WHERE", "VALUES", "UPDATE", "DELETE", "DROP", "INSERT", "MIN", "MAX", "COUNT", "SUM",
+                "AVG"
+            };
+
+            foreach (IntSchTable table in db.GetTables())
+            {
+                autoCompleteList.Add(table.Name);
+            }
+
+            autocompleteMenu1.Items = autoCompleteList.ToArray();
         }
 
         private void BtnSubmitQuery_Click(object sender, EventArgs e)

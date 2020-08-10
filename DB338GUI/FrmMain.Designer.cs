@@ -53,7 +53,7 @@ namespace DB338GUI
             this.autocompleteMenu1.SetAutocompleteMenu(this.TxtQuery, this.autocompleteMenu1);
             this.TxtQuery.AutoIndentChars = false;
             this.TxtQuery.AutoIndentCharsPatterns = "";
-            this.TxtQuery.AutoScrollMinSize = new System.Drawing.Size(596, 90);
+            this.TxtQuery.AutoScrollMinSize = new System.Drawing.Size(29, 18);
             this.TxtQuery.BackBrush = null;
             this.TxtQuery.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (64)))), ((int) (((byte) (64)))), ((int) (((byte) (64)))));
             this.TxtQuery.CharHeight = 18;
@@ -150,7 +150,7 @@ namespace DB338GUI
             this.autocompleteMenu1.Colors = ((AutocompleteMenuNS.Colors) (resources.GetObject("autocompleteMenu1.Colors")));
             this.autocompleteMenu1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.autocompleteMenu1.ImageList = null;
-            this.autocompleteMenu1.Items = new string[] {"select", "SELECT", "from", "FROM", "where", "WHERE"};
+            this.autocompleteMenu1.Items = new string[] {"SELECT", "FROM", "WHERE", "VALUES", "UPDATE", "DELETE", "DROP", "INSERT", "MIN", "MAX", "COUNT", "SUM", "AVG"};
             this.autocompleteMenu1.TargetControlWrapper = null;
             // 
             // FrmMain
