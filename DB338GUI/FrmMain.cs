@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Windows.Forms;
 using DB338Core;
@@ -67,11 +68,10 @@ namespace DB338GUI
         {
             string[] trimmedLines = GetTrimmedLines();
 
-            string[] queries = String.Join(" ", trimmedLines).Split(';');
+            string[] queries = String.Join(" ", trimmedLines).Split(';').Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
             for (int i = 0; i < queries.Length; ++i)
             {
-                if (queries[i] == "") continue;
-
                 QueryResult queryResult = db.SubmitQuery(queries[i]);
                 IntSchTable queryResults = queryResult.Results;
                 if (queryResult.Error != "none")
