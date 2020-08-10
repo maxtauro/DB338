@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using DB338Core;
 using EduDBGUI;
+using FastColoredTextBoxNS;
 
 namespace DB338GUI
 {
@@ -28,7 +24,20 @@ namespace DB338GUI
         public FrmMain()
         {
             InitializeComponent();
+            SetupSyntaxHighlighting();
             db = new DB338();
+        }
+
+        private void SetupSyntaxHighlighting()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
+            this.TxtQuery.SyntaxHighlighter.KeywordStyle = (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.TypesStyle = (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.StatementsStyle =  (Style) new TextStyle(Brushes.Coral, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.NumberStyle =  (Style) new TextStyle(Brushes.LightSkyBlue, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.StringStyle =  (Style) new TextStyle(Brushes.DarkSeaGreen, (Brush) null, FontStyle.Regular);
+            this.TxtQuery.SyntaxHighlighter.FunctionsStyle = (Style) new TextStyle(Brushes.Goldenrod, (Brush) null, FontStyle.Italic);
+            this.TxtQuery.Text = resources.GetString("TxtQuery.Text");
         }
 
         private void BtnSubmitQuery_Click(object sender, EventArgs e)
@@ -56,8 +65,8 @@ namespace DB338GUI
 
         private string[] GetTrimmedLines()
         {
-            string[] trimmedLines = new string[TxtQuery.Lines.Length];
-            for (int i = 0; i < TxtQuery.Lines.Length; ++i)
+            string[] trimmedLines = new string[TxtQuery.Lines.Count];
+            for (int i = 0; i < TxtQuery.Lines.Count; ++i)
             {
                 int commentIndex = TxtQuery.Lines[i].IndexOf("--");
                 trimmedLines[i] = commentIndex >= 0 ? TxtQuery.Lines[i].Substring(0, commentIndex) : TxtQuery.Lines[i];

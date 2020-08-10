@@ -22,7 +22,7 @@ namespace DB338Core
 
         public QueryResult SubmitQuery(string query)
         {
-            TextReader scriptText = new StringReader(query);
+            TextReader scriptText = new StringReader(query.ToLower());
 
             List<string> tokens = sqlParser.Parse(scriptText);
 
