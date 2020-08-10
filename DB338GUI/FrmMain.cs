@@ -65,8 +65,8 @@ namespace DB338GUI
 
         private string[] GetTrimmedLines()
         {
-            string[] trimmedLines = new string[TxtQuery.Lines.Length];
-            for (int i = 0; i < TxtQuery.Lines.Length; ++i)
+            string[] trimmedLines = new string[TxtQuery.Lines.Count];
+            for (int i = 0; i < TxtQuery.Lines.Count; ++i)
             {
                 int commentIndex = TxtQuery.Lines[i].IndexOf("--");
                 trimmedLines[i] = commentIndex >= 0 ? TxtQuery.Lines[i].Substring(0, commentIndex) : TxtQuery.Lines[i];
