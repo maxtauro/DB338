@@ -74,16 +74,20 @@ namespace DB338GUI
             {
                 QueryResult queryResult = db.SubmitQuery(queries[i]);
                 IntSchTable queryResults = queryResult.Results;
-                if (queryResult.Error != "none")
+                if (queryResult.Error.ErrorType != "none")
                 {
-                    //null means error
-                    MessageBox.Show("Input SQL contained a " + queryResult.Error + " error.");
+                    ShowError(queryResult.Error);
                 }
                 else
                 {
                     Output(queryResults);
                 }
             }
+        }
+
+        private void ShowError(InputError error)
+        {
+            MessageBox.Show("Input SQL contained a " + error.ErrorType + " error.\n" + error.ErrorMessage);
         }
 
         private string[] GetTrimmedLines()

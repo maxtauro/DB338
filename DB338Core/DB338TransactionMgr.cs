@@ -79,23 +79,28 @@ namespace DB338Core
                 {
                     continue;
                 }
-                else if (i + 3 < tokens.Count && (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max" || tokens[i].ToLower() == "min" ||
-                         tokens[i].ToLower() == "sum"))
+                else if (i + 3 < tokens.Count &&
+                         (tokens[i].ToLower() == "avg" || tokens[i].ToLower() == "max" ||
+                          tokens[i].ToLower() == "min" ||
+                          tokens[i].ToLower() == "sum"))
                 {
                     if (tokens[i + 2] == "*")
                     {
-                        queryResult.Error = "Invalid arguments for function " + tokens[i];
+                        string errorMessage = "Invalid arguments for function " + tokens[i] + "()";
+                        string errorType = "SQL";
+                        queryResult.Error = new InputError(errorType, errorMessage);
                         return;
                     }
 
                     colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
                     colsToValidate.Add(tokens[i + 2]);
                     i += 3;
-                } else if (i + 3 < tokens.Count && tokens[i].ToLower() == "count")
+                }
+                else if (i + 3 < tokens.Count && tokens[i].ToLower() == "count")
                 {
                     colsToSelect.Add(tokens[i] + tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
                     colsToValidate.Add(tokens[i + 2]);
-                    i += 3; 
+                    i += 3;
                 }
                 else
                 {
@@ -118,7 +123,9 @@ namespace DB338Core
 
             if (tableToSelectFrom == null)
             {
-                queryResult.Error = "Could not find table: " + nameOfTableToSelectFrom;
+                string errorMessage = "Could not find table: " + nameOfTableToSelectFrom;
+                string errorType = "SQL";
+                queryResult.Error = new InputError(errorType, errorMessage);
                 return;
             }
 
@@ -136,7 +143,9 @@ namespace DB338Core
 
             if (missingColumns.Count != 0)
             {
-                queryResult.Error = "Could not find columns: " + String.Join(",", missingColumns);
+                string errorMessage = "Could not find columns: " + String.Join(",", missingColumns);
+                string errorType = "SQL";
+                queryResult.Error = new InputError(errorType, errorMessage);
                 return;
             }
 
@@ -380,10 +389,11 @@ namespace DB338Core
             string nameOfTableToDrop = tokens[2];
             IntSchTable tableToDrop = GetTable(nameOfTableToDrop);
 
-            //TODO make error message more verbose.
             if (tableToDrop == null)
             {
-                queryResult.Error = "Could not find table: " + nameOfTableToDrop;
+                string errorMessage = "Could not find table: " + nameOfTableToDrop;
+                string errorType = "SQL";
+                queryResult.Error = new InputError(errorType, errorMessage);
                 return;
             }
 

@@ -34,7 +34,7 @@ namespace DB338Core
             string queryType = tokens[tokens.Count - 4];
             string done = tokens[tokens.Count - 3];
             string accepted = tokens[tokens.Count - 2];
-            string error = tokens[tokens.Count - 1];
+            InputError error = new InputError(tokens[tokens.Count - 1], "");
 
             tokens.RemoveAt(tokens.Count - 1);
             tokens.RemoveAt(tokens.Count - 1);
