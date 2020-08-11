@@ -25,6 +25,7 @@ namespace DB338GUI
         public FrmMain()
         {
             InitializeComponent();
+            TxtQuery.CustomAction += BtnSubmitQuery_Click;
             SetupSyntaxHighlighting();
             db = new DB338(UpdateAutoComplete);
         }
@@ -65,6 +66,11 @@ namespace DB338GUI
         }
 
         private void BtnSubmitQuery_Click(object sender, EventArgs e)
+        {
+            SubmitQuery();
+        }
+
+        private void SubmitQuery()
         {
             string[] trimmedLines = GetTrimmedLines();
 
@@ -160,4 +166,5 @@ namespace DB338GUI
             }
         }
     }
+    
 }
