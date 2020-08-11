@@ -25,7 +25,7 @@ namespace DB338Core
 
             if (type == "create")
             {
-                success = ProcessCreateTableStatement(tokens);
+                success = ProcessCreateTableStatement(tokens, ref queryResult);
             }
             else if (type == "insert")
             {
@@ -250,7 +250,7 @@ namespace DB338Core
             return false;
         }
 
-        private bool ProcessCreateTableStatement(List<string> tokens)
+        private bool ProcessCreateTableStatement(List<string> tokens, ref QueryResult queryResult)
         {
             // assuming only the following rule is accepted
             // <Create Stm> ::= CREATE TABLE Id '(' <ID List> ')'  ------ NO SUPPORT for <Constraint Opt>
@@ -261,7 +261,9 @@ namespace DB338Core
             {
                 if (tbl.Name == newTableName)
                 {
-                    //cannot create a new table with the same name
+                    string errorType = "SQL";
+                    string errorMsg = "table " + tbl.Name + " already exists";
+                    queryResult.Error = new InputError(errorType, errorMsg);
                     return false;
                 }
             }
