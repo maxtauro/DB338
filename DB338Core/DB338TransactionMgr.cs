@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DB338Core
 {
@@ -29,7 +30,7 @@ namespace DB338Core
             }
             else if (type == "insert")
             {
-                success = ProcessInsertStatement(tokens);
+                success = ProcessInsertStatement(tokens, ref queryResult);
             }
             else if (type == "select")
             {
@@ -180,7 +181,7 @@ namespace DB338Core
             return tables;
         }
 
-        private bool ProcessInsertStatement(List<string> tokens)
+        private bool ProcessInsertStatement(List<string> tokens, ref QueryResult queryResult)
         {
             // <Insert Stm> ::= INSERT INTO Id '(' <ID List> ')' VALUES '(' <Expr List> ')'
 
@@ -229,6 +230,9 @@ namespace DB338Core
                     }
 
                     if (columnNames.Count != columnValues.Count)
+                    {
+                        return false;
+                    } else if (!ValidateColumns(ref queryResult, columnNames, tbl, false))
                     {
                         return false;
                     }
