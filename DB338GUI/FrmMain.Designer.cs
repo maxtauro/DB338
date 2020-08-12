@@ -147,6 +147,7 @@ namespace DB338GUI
             // 
             // autocompleteMenu1
             // 
+            this.autocompleteMenu1.AllowsTabKey = true;
             this.autocompleteMenu1.Colors = ((AutocompleteMenuNS.Colors) (resources.GetObject("autocompleteMenu1.Colors")));
             this.autocompleteMenu1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.autocompleteMenu1.ImageList = null;
