@@ -130,20 +130,22 @@ namespace DB338Core
             }
 
             if (!ValidateColumns(ref queryResult, colsToValidate, tableToSelectFrom, /*allowWildcard=*/ true)) return;
-            
+
             SQLConditional sqlConditional = ParseWhereClause(tokens);
 
             // Validate conditional
             List<string> conditionalColumns = sqlConditional.GetColumns();
-            if (!ValidateColumns(ref queryResult, conditionalColumns, tableToSelectFrom, /*allowWildCard=*/ false)) return;
-            
+            if (!ValidateColumns(ref queryResult, conditionalColumns, tableToSelectFrom, /*allowWildCard=*/
+                false)) return;
+
             // Execute Selection
             results = tableToSelectFrom.Select(colsToSelect, sqlConditional);
             queryResult.Results = results;
             return;
         }
 
-        private bool ValidateColumns(ref QueryResult queryResult, List<string> colsToValidate, IntSchTable tableToValidate,
+        private bool ValidateColumns(ref QueryResult queryResult, List<string> colsToValidate,
+            IntSchTable tableToValidate,
             bool allowWildCard)
         {
             List<string> missingColumns = new List<string>();
@@ -407,33 +409,11 @@ namespace DB338Core
             }
 
             tableToDeleteFrom = GetTable(tokens[tableOffset]);
+            
+            SQLConditional sqlConditional = ParseWhereClause(tokens);
 
-
-            SQLConditional sqlConditional;
-
-            if (tableOffset + 1 < tokens.Count - 1 &&
-                (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
-            {
-                int whereClauseStart = tableOffset + 2;
-                int whereClauseEnd = whereClauseStart;
-
-                for (; whereClauseEnd < tokens.Count; ++whereClauseEnd)
-                {
-                    // Rough stopping point for now, TODO implement more robust parsing
-                    if (tokens[whereClauseEnd] == "GROUP" || tokens[whereClauseEnd] == "HAVING")
-                    {
-                        break;
-                    }
-                }
-
-                string[] conditionSubArray =
-                    tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
-                sqlConditional = new SQLConditional(conditionSubArray);
-            }
-            else
-            {
-                sqlConditional = new SQLConditional(new string[0]);
-            }
+            if (!ValidateColumns(ref queryResult, sqlConditional.GetColumns(), tableToDeleteFrom,
+                allowWildCard: false)) return;
 
             tableToDeleteFrom.Delete(sqlConditional);
         }

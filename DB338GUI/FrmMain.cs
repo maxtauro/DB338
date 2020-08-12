@@ -29,6 +29,8 @@ namespace DB338GUI
             TxtQuery.CustomAction += BtnSubmitQuery_Click;
             SetupSyntaxHighlighting();
             db = new DB338(UpdateAutoComplete);
+            
+            UpdateAutoComplete();
         }
 
         private void SetupSyntaxHighlighting()
