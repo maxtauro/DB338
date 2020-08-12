@@ -14,6 +14,8 @@ namespace DB338Core
         private SQLParser sqlParser;
         private DB338TransactionMgr transactionMgr;
 
+        private List<string> logs = new List<string>();
+
         public DB338(Action onDbUpdated)
         {
             OnDbUpdated = onDbUpdated;
@@ -45,6 +47,7 @@ namespace DB338Core
             {
                 QueryResult queryResult = new QueryResult(queryType, done, accepted, error);
                 transactionMgr.Process(tokens, queryType, ref queryResult);
+                logs.Add(query);
                 OnDbUpdated();
                 return queryResult;
             }
@@ -88,6 +91,11 @@ namespace DB338Core
             IntSchTable createdTable = GetTable(tableNameToCreate);
 
             return createdTable;
+        }
+
+        public string[] GetLogs()
+        {
+            return logs.ToArray();
         }
 
         private IntSchTable GetTable(string tableName)

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using DB338Core;
 using EduDBGUI;
 using FastColoredTextBoxNS;
+using Syroot.Windows.IO;
 
 namespace DB338GUI
 {
@@ -165,6 +166,19 @@ namespace DB338GUI
                 }
             }
         }
+
+        /*
+         * Very rudimentary logging, for simplicity we save logs to the
+         * downloads folder when the application terminates.
+         */
+        private void FrmMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            string downloadsPath = new KnownFolder(KnownFolderType.Downloads).Path;
+            string timestamp = new string(Array.FindAll(DateTime.UtcNow.ToString().ToCharArray(),
+                (c => (char.IsLetterOrDigit(c)))));
+            string fileName = downloadsPath + "\\" + timestamp + "_DB338_log.txt";
+            string[] logs = db.GetLogs();
+            File.WriteAllLines(fileName, logs);
+        }
     }
-    
 }
