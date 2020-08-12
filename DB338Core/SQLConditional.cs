@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace DB338Core
 {
 
-
 	public class SQLConditional
 	{
 		private List<Conditional> conditions = new List<Conditional>();
@@ -49,8 +48,20 @@ namespace DB338Core
 			return false;
 		}
 
+		
+		public List<string> GetColumns()
+		{
+			List<string> conditionalColumns = new List<string>();
+			foreach (Conditional conditional in conditions)
+			{
+				conditionalColumns.Add(conditional.GetColumn());
+			}
+
+			return conditionalColumns;
+		}
+
 		/* 
-		 *  A Triple consisting of a column name, condidtion type and the condition itself
+		 *  A Triple consisting of a column name, condition type and the condition itself
 		 */
 		private struct Conditional
 		{
@@ -87,7 +98,11 @@ namespace DB338Core
 					throw new NotImplementedException("Have not implemented conditional for: " + conditionType);
 				}
 			}
-		}
 
+			public string GetColumn()
+			{
+				return columnName;
+			}
+		}
 	}
 }

@@ -24,11 +24,35 @@ namespace DB338Core
             results = null;
         }
 
-        public IntSchTable Results { get => results; set => results = value; }
-        public string QueryType { get => queryType; set => queryType = value; }
-        public string Done { get => done; set => done = value; }
-        public string Accepted { get => accepted; set => accepted = value; }
-        public InputError Error { get => error; set => error = value; }
+        public IntSchTable Results
+        {
+            get => results;
+            set => results = value;
+        }
+
+        public string QueryType
+        {
+            get => queryType;
+            set => queryType = value;
+        }
+
+        public string Done
+        {
+            get => done;
+            set => done = value;
+        }
+
+        public string Accepted
+        {
+            get => accepted;
+            set => accepted = value;
+        }
+
+        public InputError Error
+        {
+            get => error;
+            set => error = value;
+        }
     }
 
     public struct InputError

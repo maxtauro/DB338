@@ -58,7 +58,7 @@ namespace DB338Core
                 string functionParameter = null;
 
                 bool isFunction = IsSelectionFunction(columnName, ref functionName, ref functionParameter);
-                
+
                 for (int i = 0; i < columns.Count; ++i)
                 {
                     string resultColumnName = columnName;
@@ -73,11 +73,10 @@ namespace DB338Core
                         }
                         else
                         {
-                            resultColumnName = functionParameter; 
+                            resultColumnName = functionParameter;
                         }
-                        
-                    } 
-                 
+                    }
+
                     if (resultColumnName == columns[i].Name)
                     {
                         for (int z = 0; z < columns[i].items.Count; ++z)
@@ -96,13 +95,13 @@ namespace DB338Core
                 {
                     rowVals.Add(result[column][row]);
                 }
-                
+
                 if (conditional.evaluate(this.columnNames.ToArray(), this.GetRow(row)))
                 {
                     resultTable.Insert(resultTable.columnNames, rowVals);
                 }
             }
-            
+
             foreach (IntSchColumn resultTableColumn in resultTable.columns)
             {
                 string functionName = null;
@@ -113,7 +112,7 @@ namespace DB338Core
                 if (isFunction)
                 {
                     string functionResult;
-                    
+
                     if (functionName == "avg")
                     {
                         functionResult = resultTableColumn.GetAverage();
@@ -138,7 +137,7 @@ namespace DB338Core
                     {
                         throw new ArgumentException("Invalid function: " + functionName);
                     }
-                    
+
                     resultTableColumn.items[0] = functionResult;
                     resultTable.numRows = 1;
                 }

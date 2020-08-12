@@ -129,15 +129,36 @@ namespace DB338Core
                 return;
             }
 
+            if (!ValidateColumns(ref queryResult, colsToValidate, tableToSelectFrom, /*allowWildcard=*/ true)) return;
+            
+            SQLConditional sqlConditional = ParseWhereClause(tokens);
 
-            // Validate Columns
+            // Validate conditional
+            List<string> conditionalColumns = sqlConditional.GetColumns();
+            if (!ValidateColumns(ref queryResult, conditionalColumns, tableToSelectFrom, /*allowWildCard=*/ false)) return;
+            
+            // Execute Selection
+            results = tableToSelectFrom.Select(colsToSelect, sqlConditional);
+            queryResult.Results = results;
+            return;
+        }
+
+        private bool ValidateColumns(ref QueryResult queryResult, List<string> colsToValidate, IntSchTable tableToValidate,
+            bool allowWildCard)
+        {
             List<string> missingColumns = new List<string>();
 
             foreach (string column in colsToValidate)
             {
-                if (column != "*" && !tableToSelectFrom.ContainsColumn(column))
+                if (column != "*" && !tableToValidate.ContainsColumn(column))
                 {
                     missingColumns.Add(column);
+                }
+
+                else if (column == "*" && !allowWildCard)
+                {
+                    queryResult.Error = new InputError("SQL", "Wildcard (*) is not allowed.");
+                    return false;
                 }
             }
 
@@ -146,40 +167,10 @@ namespace DB338Core
                 string errorMessage = "Could not find columns: " + String.Join(",", missingColumns);
                 string errorType = "SQL";
                 queryResult.Error = new InputError(errorType, errorMessage);
-                return;
+                return false;
             }
 
-            // Parse WHERE clause
-            SQLConditional sqlConditional;
-
-            if (tableOffset + 1 < tokens.Count - 1 &&
-                (tokens[tableOffset + 1] == "WHERE" || tokens[tableOffset + 1] == "where"))
-            {
-                int whereClauseStart = tableOffset + 2;
-                int whereClauseEnd = whereClauseStart;
-
-                for (; whereClauseEnd < tokens.Count; ++whereClauseEnd)
-                {
-                    // Rough stopping point for now, TODO implement more robust parsing
-                    if (tokens[whereClauseEnd] == "GROUP" || tokens[whereClauseEnd] == "HAVING")
-                    {
-                        break;
-                    }
-                }
-
-                string[] conditionSubArray =
-                    tokens.ToList().GetRange(whereClauseStart, whereClauseEnd - whereClauseStart).ToArray();
-                sqlConditional = new SQLConditional(conditionSubArray);
-            }
-            else
-            {
-                sqlConditional = new SQLConditional(new string[0]);
-            }
-
-            // Execute Selection
-            results = tableToSelectFrom.Select(colsToSelect, sqlConditional);
-            queryResult.Results = results;
-            return;
+            return true;
         }
 
         public List<IntSchTable> GetTables()
@@ -311,9 +302,6 @@ namespace DB338Core
 
         private void ProcessUpdateStatement(List<string> tokens, ref QueryResult queryResult)
         {
-            // UPDATE table_name
-            // SET column1 = value1, column2 = value2, ...
-            // WHERE condition;
             string nameOfTableToUpdate = tokens[1];
 
             List<string> columnsToUpdate = new List<string>();
@@ -322,12 +310,14 @@ namespace DB338Core
             ParseUpdates(tokens, ref columnsToUpdate, ref updatedValues);
 
             SQLConditional conditional = ParseWhereClause(tokens);
+            IntSchTable tableToUpdate = GetTable(nameOfTableToUpdate);
 
             // Validate update columns
+            if (!ValidateColumns(ref queryResult, columnsToUpdate, tableToUpdate, /*allowWildCard=*/false)) return;
 
             // Validate conditional columns
-
-            IntSchTable tableToUpdate = GetTable(nameOfTableToUpdate);
+            List<string> conditionalColumns = conditional.GetColumns();
+            if (!ValidateColumns(ref queryResult, conditionalColumns, tableToUpdate, /*allowWildCard=*/ false)) return;
 
             tableToUpdate.Update(columnsToUpdate, updatedValues, conditional);
         }
@@ -353,8 +343,6 @@ namespace DB338Core
 
         private SQLConditional ParseWhereClause(List<string> tokens)
         {
-            SQLConditional conditional;
-
             int whereIndex = 0;
 
             while (whereIndex < tokens.Count && tokens[whereIndex] != "WHERE" && tokens[whereIndex] != "where")
